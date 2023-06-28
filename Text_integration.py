@@ -9,7 +9,7 @@ def findtxt(path, ret):
     for filename in filelist:
         de_path = os.path.join(path, filename)
         if os.path.isfile(de_path):
-            if de_path.endswith(".txt"):
+            if de_path.endswith(".prompt.txt"):
                 ret.append(de_path)
         else:
             findtxt(de_path, ret)
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     filedir = filedialog.askdirectory(title='选择文件夹')
     findtxt(filedir, ret)
 
-    output_file = filedialog.asksaveasfilename(defaultextension=".txt", title='选择输出文件')
+    output_file = filedialog.asksaveasfilename(defaultextension=".prompt.txt", title='选择输出文件')
     for ret_ in ret:
         with open(output_file, 'a', encoding="utf-8") as f:
             with open(ret_, encoding="utf-8") as fp:
