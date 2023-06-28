@@ -5,7 +5,7 @@ import time
 import openai
 
 #接入openai接口
-openai.api_key = "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"
+openai.api_key = ""
 with open('prompt/prompt.txt', 'r',encoding="utf-8") as file:
     prompt_content = file.read()
     file.close()
