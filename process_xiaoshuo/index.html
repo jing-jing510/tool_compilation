@@ -1,0 +1,35 @@
+<html>
+<body>
+    <h2>OpenAI Chat Bot</h2>
+    <form id="questionForm">
+        <label for="question">Question:</label><br>
+        <input type="text" id="question" name="question"><br>
+        <label for="engine">Engine:</label><br>
+        <select id="engine" name="engine">
+            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            <option value="gpt-4.0-turbo">GPT-4.0 Turbo</option>
+            <!-- you can add more options here -->
+        </select><br>
+        <input type="submit" value="Submit">
+    </form>
+    <p id="answer"></p>
+
+    <script>
+    document.getElementById("questionForm").addEventListener("submit", function(event){
+      event.preventDefault()
+
+      let question = document.getElementById("question").value;
+      let engine = document.getElementById("engine").value;
+
+      fetch('/get_answer', {
+        method: 'POST',
+        body: JSON.stringify({question: question, engine: engine}),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json())
+        .then(data => document.getElementById("answer").textContent = data.answer);
+    });
+    </script>
+</body>
+</html>

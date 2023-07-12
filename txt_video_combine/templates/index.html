@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <title>Hello,world!</title>
+    <style>
+        body {
+
+        }
+
+        #gpt_key_div {
+            width: 100%;
+            /*margin-top: 40px;*/
+            text-align: center;
+        }
+
+        #novelNameSection {
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #bar {
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+
+        #bar button {
+            margin: 10px;
+        }
+
+        #textareaContainer {
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #textarea {
+            width: 100%;
+            height: 500px;
+            resize: none;
+        }
+
+        #fenjingContainer {
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #fenjingContainer th, #fenjingContainer td, #fenjingContainer tr {
+            border: 1px solid black;
+            /*height: 20px;*/
+            padding: 8px;
+            text-align: left;
+        }
+
+        #promptContainer {
+            width: 100%;
+
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #promptContainer th, #promptContainer td, #promptContainer tr {
+            border: 1px solid black;
+            /*height: 20px;*/
+            padding: 8px;
+            text-align: left;
+        }
+
+
+        #globalPromptForm {
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #globalPromptForm .prompt-row {
+            display: flex;
+            width: 100%;
+            height: 100px;
+            justify-content: space-between;
+        }
+
+        #globalPromptForm .prompt-row input {
+            flex: 1;
+        }
+
+        #characterSettingTable {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #characterSettingTable th, #characterSettingTable td, #characterSettingTable tr {
+            border: 1px solid black;
+            /*height: 20px;*/
+            padding: 8px;
+            text-align: left;
+        }
+
+        #sumContainer {
+            display: flex;
+            /*border: black;*/
+        }
+
+
+        #yuanwen_n, #keyPrompt, #fenjing_n {
+            flex: 1;
+            /*padding: 20px;*/
+            border: 1px solid black;
+            margin: 10px;
+        }
+
+        #yuanwen_n {
+            width: 20%;
+        }
+
+        #yuanwen_n > div {
+            /*border: 1px solid black;*/
+        }
+
+        #keyPrompt {
+            width: 60%;
+        }
+
+        #fenjing_n {
+            width: 20%;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<!--输入-->
+<div id="gpt_key_div">
+    <form id="gpt_key_form">
+        <label for="gpt_key">GPT Key:</label>
+        <input type="text" id="gpt_key" name="gpt_key">
+        <input type="submit" value="提交">
+    </form>
+</div>
+
+<!--文件夹-->
+<div id="novelNameSection">
+    <label for="novelName">小说名称:</label>
+    <input type="text" id="novelName">
+    <button id="createFolderButton">提交</button>
+</div>
+<!--导航栏-->
+<div id="bar">
+    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload()">
+    <button onclick="document.getElementById('fileInput').click();">上传原文</button>
+    <!--    <button>智能分镜</button>-->
+    <!--    <button>分镜设置</button>-->
+    <!--    <button>分镜审核</button>-->
+    <!--    <button>脚本生成</button>-->
+</div>
+<div id="textareaContainer">
+    <textarea id="textarea" placeholder="在这里输入内容..."></textarea>
+    <button id="splitTextButton">按照。进行分割</button>
+    <button id="rewriteButton">文本改写</button>
+    <button id="saveTextButton">提交</button>
+</div>
+<div id="fenjingContainer">
+    <button id="fenjingButton">智能分镜</button>
+    <input type="file" id="fenjing_fileInput" style="display: none" accept=".csv" onchange="fenjingFileUpload()">
+    <!-- 文件输入元素 -->
+    <button onclick="document.getElementById('fenjing_fileInput').click();">上传分镜设置</button>  <!-- 上传按钮 -->
+    <table id="fenjingTable">
+        <tr>
+            <th>原文</th>
+            <th>AI分镜</th>
+        </tr>
+    </table>
+    <button id="fenjing_submit">提交</button>
+</div>
+<div id="promptContainer">
+    <button id="promptButton">批量生成关键词</button>
+    <input type="file" id="prompt_fileInput" style="display: none" accept=".csv">
+    <!-- 文件输入元素 -->
+    <button onclick="document.getElementById('prompt_fileInput').click();">上传生成的关键词</button>  <!-- 上传按钮 -->
+    <table id="promptTable" contenteditable="true">
+        <tr>
+            <th>原文</th>
+            <th>AI分镜</th>
+            <th>关键词</th>
+        </tr>
+    </table>
+    <button id="prompt_submit">提交</button>
+</div>
+
+
+<div id="globalPromptContainer">
+    <h2>全局提示词</h2>
+    <form id="globalPromptForm">
+        <div class="prompt-row">
+            <label for="positive_prompt">正面描述词:</label><br>
+            <input type="text" id="positive_prompt" name="positive_prompt"
+                   value="4K,High Quality, realistic, contrast,masterpiece">
+            <label for="negative_prompt">反面提示词:</label><br>
+            <input type="text" id="negative_prompt" name="negative_prompt"
+                   value="nfsw, sketches, (worst quality:2),(low quality:2), low res,((monochrome)),((grayscale)),skin spots, acnes, skin blemishes, bad anatomy,(long hair:1.4),DeepNegative,(fat:1.2),facing away, looking away, tilted head, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, signature,watermark, username, blurry, bad feet, cropped, poorly drawn hands, poorly drawn face, mutation, deformed, worst quality, low quality, normal quality, jpeg, artifacts, signature, watermark, extra fingers, fewer digits, extra limbs, extra arms, extra legs, malformed limbs, fused fingers, too many fingers, long neck, cross eyed, mutated hands, polar low res, bad body, bad proportions, gross,proportions, text, error, missing fingers, missing arms, missing legs, extra digit, extra arms, extra leg, extra foot">
+        </div>
+    </form>
+
+    <h2>人物设定</h2>
+    <table id="characterSettingTable" contenteditable="true">
+        <tr>
+            <th>角色名称</th>
+            <th>中文</th>
+            <th>英文</th>
+            <th>Lora模型名称</th>
+            <th>Lora模型权重</th>
+            <th>翻译</th>
+        </tr>
+
+    </table>
+    <button id="addRowButton">添加空白行</button>
+    <button id="uploadGlobalPromptButton">上传全局提示词</button>
+    <input type="file" id="globalPromptFileInput" accept=".json" style="display: none">
+    <button id="globalPrompt_submit">提交</button>
+</div>
+<h1>关键词整理</h1>
+<input type="file" id="csvFile" style="display: none;" onchange="upload()">
+<button onclick="document.getElementById('csvFile').click();">上传原文</button>
+<div id="sumContainer">
+<!--    <input type="file" id="csvFile" accept=".csv" />-->
+<!--    <button onclick="upload()">Upload</button>-->
+    <div id="yuanwen_n"></div>
+    <div id="keyPrompt" contenteditable="true"></div>
+    <div id="fenjing_n" contenteditable="true" ></div>
+
+    <button onclick="save()">Save Changes</button>
+</div>
+
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    // 将gpt_key放到表单里面
+    document.getElementById('gpt_key_form').addEventListener('submit', function (event) {
+        // 阻止表单的默认提交行为，这样页面就不会刷新
+        event.preventDefault();
+
+        // 获取用户输入的 GPT key
+        var gpt_key = document.getElementById('gpt_key').value;
+
+        // 在这里，你可以处理 gpt_key，例如发送它到你的服务器
+        // 发送GPT key到服务器
+        fetch('/set_key', {
+            method: 'POST',
+            body: JSON.stringify({gpt_key: gpt_key}),
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('提交成功!');
+                } else {
+                    alert('提交失败!');
+                }
+            });
+        console.log('用户输入的 GPT key:', gpt_key);
+    });
+
+
+    // 创建文件夹
+    document.getElementById('createFolderButton').addEventListener('click', function () {
+        const novelName = document.getElementById('novelName').value;
+        console.log(novelName)
+        fetch('/create_folder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({folderName: novelName}),
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+            .then(data => {
+                if (data['status'] === 'success') {
+                    alert('文件夹创建成功!');
+                } else {
+                    alert('文件夹创建失败!');
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    });
+
+
+    // 处理上传文件,并将上传的文件放到text当中
+    function handleFileUpload() {
+        var fileInput = document.getElementById('fileInput');
+        var file = fileInput.files[0];
+
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            var contents = e.target.result;
+
+            fetch("/handle_file",
+                {
+                    method: "POST",
+                    body: JSON.stringify({data: contents}),
+                    headers: {'Content-Type': 'application/json'}
+                }
+            )
+                .then(response => response.json())
+                .then(data => {
+                    var textarea = document.getElementById('textarea');
+                    document.getElementById('textarea').value = data['text'];
+                    autoAdjustHeight(textarea);
+                })
+        };
+        reader.readAsText(file)
+    }
+
+    // 让文本框自适应高度
+    function autoAdjustHeight(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    // 按照。进行分割
+    document.getElementById('splitTextButton').addEventListener('click', function () {
+        const textarea = document.getElementById('textarea');
+        const text = textarea.value;
+        // 按照句号分割，然后加上换行符
+        const newText = text.split('。').join('。\n');
+        // 将新的内容放回textarea
+        textarea.value = newText;
+    });
+
+    // 改文
+    $('#rewriteButton').click(function() {
+                let text = $('#textarea').val();
+                $.ajax({
+                    url: '/rewrite',
+                    type: 'POST',
+                    data: JSON.stringify({text: text}),
+                    contentType: 'application/json',
+                    success: function(data) {
+                        $('#textarea').val(data.rewritten_text);
+                    },
+                    error: function() {
+                        alert('An error occurred while rewriting the text.');
+                    }
+                });
+            });
+
+    // 提交#textarea内容
+    document.getElementById('saveTextButton').addEventListener('click', function () {
+        const text = document.getElementById('textarea').value;
+        const folderName = document.getElementById('novelName').value;
+        fetch('/save_text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({folderName: folderName, text: text}),
+        }).then(response => {
+            if (response.ok) {
+                alert('原文保存成功!');
+            } else {
+                alert('原文保存失败!');
+            }
+        });
+    });
+
+    // 分镜操作
+    document.getElementById('fenjingButton').addEventListener('click', function () {
+        // 读取原文.txt文件的内容
+        fetch('/read_file', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({filename: '原文.txt'}),
+        })
+            .then(response => response.json())
+            .then(data => {
+                const textLines = data.text.split('\n');
+
+                // 清空表格，只保留标题行
+                const table = document.getElementById('fenjingTable');
+                while (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+
+                // 将文本的每一行都添加到表格中
+                for (const text of textLines) {
+                    const row = table.insertRow();
+                    const textCell = row.insertCell();
+                    textCell.textContent = text;
+                    textCell.contentEditable = "true";
+                    const aiCell = row.insertCell();
+                    aiCell.textContent = '正在计算...';
+                    aiCell.contentEditable = "true";
+
+                    // 调用后端的API获取AI分镜的结果
+                    fetch('/ai_fenjing', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({text: text}),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // 更新表格中的内容
+                            aiCell.textContent = data.result;
+                        });
+                    // 添加新的列，包含一个"重绘"按钮
+                    const redrawCell = row.insertCell();
+                    const redrawButton = document.createElement('button');
+                    redrawButton.textContent = '重绘';
+                    redrawButton.addEventListener('click', function () {
+                        // 点击按钮时，获取当前行的“原文”列的内容
+                        const text = textCell.textContent;
+
+                        // 重新执行 ai_fenjing 方法
+                        fetch('/ai_fenjing', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({text: text}),
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                // 更新 AI 分镜列的内容
+                                aiCell.textContent = data.result;
+                            });
+                    });
+                    redrawCell.appendChild(redrawButton);
+                }
+            });
+    });
+    // 未完成 静等
+
+    // 提交分镜 保存成分镜设置.csv
+    document.getElementById('fenjing_submit').addEventListener('click', function () {
+        // 获取表格的所有行
+        const rows = Array.from(document.getElementById('fenjingTable').rows).slice(1);  // 跳过标题行
+
+        // 获取每一行的内容
+        const data = rows.map(row => {
+            const cells = row.cells;
+            return [cells[0].textContent, cells[1].textContent];  // 只获取"原文"和"AI分镜"两列的内容
+        });
+
+        // 发送请求到后端
+        fetch('/save_to_csv', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({rows: data}),
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('数据已保存到csv!');
+                } else {
+                    alert('保存到csv失败!');
+                }
+            });
+    });
+
+    //     读取分镜excl
+    function fenjingFileUpload() {
+        var fenjing_input = document.getElementById("fenjing_fileInput");
+        var file = fenjing_input.files[0];
+        if (file) {
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload_csv', {
+                    method: "POST",
+                    body: formData,
+                }
+            )
+                .then(response => response.json())
+                .then(
+                    data => {
+                        const table = document.getElementById('fenjingTable')
+                        //     清楚表哥,只保留标题行
+                        while (table.rows.length > 1) {
+                            table.deleteRow(1);
+                        }
+                        //     数据填充
+                        for (const row of data.rows) {
+                            const tableRow = table.insertRow();
+                            const textCell = tableRow.insertCell();
+                            textCell.textContent = row[0];
+                            textCell.contentEditable = "true";
+                            const aiCell = tableRow.insertCell();
+                            aiCell.textContent = row[1];
+                            aiCell.contentEditable = "true";
+                            // 插入重绘按钮
+                            const redrawCell = tableRow.insertCell();
+                            const redrawButton = document.createElement('button');
+                            redrawButton.textContent = '重绘';
+                            redrawCell.appendChild(redrawButton);
+                            redrawButton.addEventListener('click', function () {
+                                // 点击按钮时，获取当前行的“原文”列的内容
+                                const text = textCell.textContent;
+
+                                // 重新执行 ai_fenjing 方法
+                                fetch('/ai_fenjing', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({text: text}),
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        // 更新 AI 分镜列的内容
+                                        aiCell.textContent = data.result;
+                                    });
+                            });
+                            redrawCell.appendChild(redrawButton);
+                        }
+                    }
+                )
+
+        }
+    }
+
+    // 关键词生成
+
+
+    //     全局提示词和人物设定
+    document.getElementById('globalPrompt_submit').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // 获取全局提示词表单的数据
+        const globalHintForm = document.getElementById('globalPromptForm');
+        const formData = new FormData(globalHintForm);
+        const globalHintData = Object.fromEntries(formData.entries());
+
+        // 获取人物设定表格的数据
+        const table = document.getElementById('characterSettingTable');
+        const rows = Array.from(table.rows).slice(1); // 跳过标题行
+        const characterSettingData = rows.map(row => Array.from(row.cells).map(cell => cell.textContent));
+
+        // 打印结果
+        console.log({
+            globalHint: globalHintData,
+            characterSetting: characterSettingData,
+        });
+    });
+    // 给人物设定添加空白行 并进行中英文翻译
+    document.getElementById('addRowButton').addEventListener('click', function () {
+        var table = document.getElementById('characterSettingTable');
+        var row = table.insertRow(-1);  // 插入新行
+
+        for (var i = 0; i < table.rows[0].cells.length; i++) {
+            row.insertCell(i);  // 对于每个表头，插入一个新的单元格
+        }
+        // 在“翻译”单元格中添加翻译按钮
+        var translateButton = document.createElement('button');
+        translateButton.textContent = '翻译';
+        row.children[5].appendChild(translateButton);
+
+        // 为翻译按钮添加click事件监听器
+        translateButton.addEventListener('click', function () {
+            // 获取这一行的“中文”单元格的内容
+            var zhText = row.children[1].textContent;
+            // 使用Fetch API向服务器发送POST请求
+            fetch('/translate_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({text: zhText})  // 将中文文本作为请求体发送
+            })
+                .then(response => response.json())  // 解析返回的JSON响应体
+                .then(data => {
+                    // 将翻译的结果放到“英文”单元格中
+                    console.log(data);
+                    row.children[2].textContent = data.translatedText;
+                    // 提交成功，弹出警告框
+                    window.alert("提交成功！");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+
+                    // 提交失败，弹出警告框并显示错误信息
+                    window.alert("提交失败！\n" + error);
+                });
+        });
+
+    });
+    // 人物设定中 全面描述词提交到novel/config.json当中
+    document.getElementById('globalPrompt_submit').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // 获取全局提示词表单的数据
+        const globalHintForm = document.getElementById('globalPromptForm');
+        const formData = new FormData(globalHintForm);
+        const globalHintData = Object.fromEntries(formData.entries());
+
+        // 获取人物设定表格的数据
+        const table = document.getElementById('characterSettingTable');
+        const rows = Array.from(table.rows).slice(1); // 跳过标题行
+        const characterSettingData = rows.map(row => {
+            let cells = Array.from(row.cells);
+            return {
+                character: cells[0].textContent,
+                cn_text: cells[1].textContent,
+                en_text: cells[2].textContent,
+                lora_model_name: cells[3].textContent,
+                lora_model_weight: cells[4].textContent,
+            };
+        });
+
+        // 发送POST请求到服务器
+        fetch('/save_to_config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                globalHint: globalHintData,
+                characterSetting: characterSettingData,
+            })
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            console.log('Configuration saved successfully');
+        }).catch(error => console.error('Error:', error));
+    });
+
+    //     上传全面提示词
+    document.getElementById('uploadGlobalPromptButton').addEventListener('click', function () {
+        document.getElementById('globalPromptFileInput').click();
+    });
+
+    //     // 这是一个用于添加翻译按钮click事件监听器的函数
+    function addTranslateButtonEventListener(button, row) {
+        button.addEventListener('click', function () {
+            // 获取这一行的“中文”单元格的内容
+            var zhText = row.children[1].textContent;
+            // 使用Fetch API向服务器发送POST请求
+            fetch('/translate_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({text: zhText})  // 将中文文本作为请求体发送
+            })
+                .then(response => response.json())  // 解析返回的JSON响应体
+                .then(data => {
+                    // 将翻译的结果放到“英文”单元格中
+                    row.children[2].textContent = data.translatedText;
+                    // 提交成功，弹出警告框
+                    // window.alert("");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+
+                    // 提交失败，弹出警告框并显示错误信息
+                    window.alert("提交失败！\n" + error);
+                });
+        });
+    }
+
+    //     上传的全面提示词 放置到表格当中
+    document.getElementById('globalPromptFileInput').addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function () {
+            var data = JSON.parse(reader.result);
+
+            // 将数据放到对应的位置
+            document.getElementById('positive_prompt').value = data.globalHint.positive_prompt;
+            document.getElementById('negative_prompt').value = data.globalHint.negative_prompt;
+
+            var table = document.getElementById('characterSettingTable');
+            // 首先，清空表格的所有行，除了标题行
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            // 然后，为每一个角色设置数据创建一个新的行
+            // 再填充数据
+            for (var i = 0; i < data.characterSetting.length; i++) {
+                var characterSetting = data.characterSetting[i];
+                var row = table.insertRow(-1);  // 插入新行
+                var cell;
+                cell = row.insertCell(-1);  // 插入新的单元格
+                cell.textContent = characterSetting.character;
+                cell = row.insertCell(-1);  // 插入新的单元格
+                cell.textContent = characterSetting.cn_text;
+                cell = row.insertCell(-1);  // 插入新的单元格
+                cell.textContent = characterSetting.en_text;
+                cell = row.insertCell(-1);  // 插入新的单元格
+                cell.textContent = characterSetting.lora_model_name;
+                cell = row.insertCell(-1);  // 插入新的单元格
+                cell.textContent = characterSetting.lora_model_weight;
+                cell = row.insertCell(-1);  // 插入翻译按钮单元格
+                // 在“翻译”单元格中添加翻译按钮
+                var translateButton = document.createElement('button');
+                translateButton.textContent = '翻译';
+                cell.appendChild(translateButton);
+                // 为翻译按钮添加click事件监听器
+                addTranslateButtonEventListener(translateButton, row);
+            }
+        };
+
+        reader.readAsText(file);
+    });
+
+
+    // 页面加载
+    // window.addEventListener('load', function () {
+    //     fetch('/get_prompts')
+    //         .then(response => response.json())
+    //         .then(prompts => {
+    //             var yuanwenDiv = document.getElementById('yuanwen_n');
+    //             var fenjingDiv = document.getElementById('fenjing_n');
+    //
+    //             for (let prompt of prompts) {
+    //                 let yuanwen = document.createElement('div');
+    //                 yuanwen.textContent = prompt.yuanwen;
+    //                 yuanwen.addEventListener('click', function () {
+    //                     fenjingDiv.textContent = prompt.fenjing;
+    //                 });
+    //                 yuanwenDiv.appendChild(yuanwen);
+    //
+    //                 let fenjing = document.createElement('div');
+    //                 fenjing.textContent = prompt.fenjing;
+    //                 fenjingDiv.appendChild(fenjing);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error:', error));
+    // });
+
+
+    // 生成关键词
+    document.getElementById('promptButton').addEventListener('click', async function () {
+        const response = await fetch('/read_file', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({filename: '分镜设置.csv'}),
+        });
+
+        const data = await response.json();
+        const lines = Papa.parse(data.text, {header: true}).data;
+        const table = document.getElementById('promptTable');
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+
+        for (const row of lines) {
+            if (!row.原文.trim() || !row.AI分镜.trim()) {
+                continue;  // skip this row if either text or aiFenjing is empty
+            }
+
+            const tableRow = table.insertRow();
+            tableRow.insertCell().textContent = row.原文;
+            const aiCell = tableRow.insertCell();
+            aiCell.textContent = row.AI分镜;
+            const keywordCell = tableRow.insertCell();
+            keywordCell.textContent = '正在计算...';
+
+            const keywordResponse = await fetch('/ai_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({text: row.AI分镜}),
+            });
+
+            const keywordData = await keywordResponse.json();
+            keywordCell.textContent = keywordData.result;
+
+            // const translateCell = tableRow.insertCell();
+            // translateCell.textContent ='等待翻译..';
+            // const translateResponse = await fetch('/translate_text',{
+            //     method : 'POST',
+            //     headers :{
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({text: row.关键词}),
+            // })
+            // const translateData = await translateResponse.json();
+            // keywordCell.textContent = translateData.result;
+
+            //添加一个重新生成按钮
+            const regenerateCell = tableRow.insertCell();
+            const regenerateButton = document.createElement('button');
+            regenerateButton.textContent = '重新生成关键词';
+            regenerateButton.addEventListener('click', async function () {
+                // When the button is clicked, get the text from the "AI Fenjing" cell
+                const aiText = aiCell.textContent;
+
+                // Call the ai_prompt method again
+                const regenerateResponse = await fetch('/ai_prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({text: aiText}),
+                });
+
+                const regenerateData = await regenerateResponse.json();
+
+                // Update the "Keywords" cell with the new result
+                keywordCell.textContent = regenerateData.result;
+                alert("重新生成完毕")
+                console("重新生成完毕")
+            });
+
+            regenerateCell.appendChild(regenerateButton);
+        }
+
+    });
+
+    //     提交关键词
+    document.getElementById('prompt_submit').addEventListener('click', async function () {
+        const table = document.getElementById('promptTable');
+        let data = [];
+        for (let i = 1; i < table.rows.length; i++) {  // skip header row
+            let row = table.rows[i];
+            data.push({
+                '原文': row.cells[0].textContent,
+                'AI分镜': row.cells[1].textContent,
+                '关键词': row.cells[2].textContent
+                // '翻译': row.cells[3].textContent
+            });
+        }
+
+        // Send data to the server
+        await fetch('/save_csv', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({data: data}),
+        });
+    });
+
+    //     从文件csv读取关键词
+    document.getElementById('prompt_fileInput').addEventListener('change', async function (event) {
+        let file = event.target.files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/load_csv', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        const table = document.getElementById('promptTable');
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+
+        for (const row of data.data) {
+            const tableRow = table.insertRow();
+            tableRow.insertCell().textContent = row['原文'];
+            tableRow.insertCell().textContent = row['AI分镜'];
+            tableRow.insertCell().textContent = row['关键词'];
+            // 添加重新生成关键词的按钮
+            const regenerateCell = tableRow.insertCell();
+            const regenerateButton = document.createElement('button');
+            regenerateButton.textContent = '重新生成关键词';
+            regenerateButton.addEventListener('click', function () {
+                const aiFenjing = tableRow.cells[1].textContent;
+                fetch('/ai_prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({text: aiFenjing}),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        tableRow.cells[2].textContent = data.result;
+                    });
+            });
+            regenerateCell.appendChild(regenerateButton);
+        }
+    });
+
+    // 关键词整理
+    document.getElementById('csvFile').addEventListener('change', function(evt) {
+    var file = evt.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var lines = contents.split('\n');
+
+        // 清空内容
+        document.getElementById('yuanwen_n').innerHTML = '';
+        document.getElementById('KeyPrompt').innerHTML = '';
+        document.getElementById('fenjing_n').innerHTML = '';
+
+        for (var i = 0; i < lines.length; i++) {
+            var row = lines[i].split(',');
+            var button = document.createElement('button');
+            button.textContent = row[0]; // 原文
+            button.onclick = (function(row) {
+                return function() {
+                    document.getElementById('KeyPrompt').textContent = row[2]; // 关键词
+                    document.getElementById('fenjing_n').textContent = row[1]; // AI分镜
+                };
+            })(row);
+            document.getElementById('yuanwen_n').appendChild(button);
+        }
+    };
+    reader.readAsText(file);
+});
+
+     // 关键词上传
+let data = {}
+    function upload() {
+            let file = $('#csvFile')[0].files[0];
+            let formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    data = response;
+                    $('#yuanwen_n').empty();
+                    for (let i = 0; i < data.yuanwen.length; i++) {
+                        let btn = $('<button>' + data.yuanwen[i] + '</button>');
+                        btn.click(function() {
+                            $('#keyPrompt').text(data.key[i]);
+                            $('#fenjing_n').text(data.fenjing[i]);
+
+                        });
+                        $('#yuanwen_n').append(btn);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while uploading the file.');
+                }
+            });
+        }
+
+//         编辑更新
+    function save() {
+            let fenjing = $('#fenjing_n').text();
+            let key = $('#keyPrompt').text();
+            let yuanwen_n = $('#yuanwen_n button').index($('button:contains("' + fenjing + '")'));
+
+            // Update the client-side data
+            data.fenjing[yuanwen_n] = fenjing;
+            data.key[yuanwen_n] = key;
+
+            $.ajax({
+                url: '/save',
+                type: 'POST',
+                data: JSON.stringify({fenjing: fenjing, key: key, yuanwen_n: yuanwen_n}),
+                contentType: 'application/json',
+                success: function() {
+                    alert('Saved successfully!');
+                },
+                error: function() {
+                    alert('An error occurred while saving.');
+                }
+            });
+        }
+
+</script>
+</html>

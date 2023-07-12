@@ -1,0 +1,22 @@
+{
+    "globalHint": {
+        "positive_prompt": "4K,High Quality, realistic, contrast,masterpiece",
+        "negative_prompt": "nfsw, sketches, (worst quality:2),(low quality:2), low res,((monochrome)),((grayscale)),skin spots, acnes, skin blemishes, bad anatomy,(long hair:1.4),DeepNegative,(fat:1.2),facing away, looking away, tilted head, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, signature,watermark, username, blurry, bad feet, cropped, poorly drawn hands, poorly drawn face, mutation, deformed, worst quality, low quality, normal quality, jpeg, artifacts, signature, watermark, extra fingers, fewer digits, extra limbs, extra arms, extra legs, malformed limbs, fused fingers, too many fingers, long neck, cross eyed, mutated hands, polar low res, bad body, bad proportions, gross,proportions, text, error, missing fingers, missing arms, missing legs, extra digit, extra arms, extra leg, extra foot"
+    },
+    "characterSetting": [
+        {
+            "character": "我",
+            "cn_text": "1boy, goat beard, white hair, suit",
+            "en_text": "1 boy, goat beard, white hair, suit.",
+            "lora_model_name": "",
+            "lora_model_weight": ""
+        },
+        {
+            "character": "你",
+            "cn_text": "1boy,男孩,红头发,白T恤",
+            "en_text": "1 boy, a boy, red hair, white T-shirt.",
+            "lora_model_name": "",
+            "lora_model_weight": ""
+        }
+    ]
+}
