@@ -9,7 +9,7 @@ from openpyxl import load_workbook
 from werkzeug.utils import secure_filename
 import pandas as pd
 
-from openai_text import ai_fenjing, ai_prompt, translate_text_en2cn,rewriteText
+from openai_text import ai_fenjing, ai_prompt, translate_text_en2cn , rewriteText
 import os
 df = pd.DataFrame()
 app = Flask(__name__)
@@ -39,18 +39,17 @@ def set_key():
 
     config = {}
 
-    if os.path.exists('env/config.json'):
+    if os.path.exists('config.json'):
         # 如果 config.json 文件存在，读取现有的配置
-        with open('env/config.json', 'r') as f:
+        with open('config.json', 'rb') as f:
             config = json.load(f)
 
-    # 如果'OPENAI_API_KEY'不存在，就更新或设置 GPT key
-    if 'OPENAI_API_KEY' not in config:
-        config['OPENAI_API_KEY'] = gpt_key
+    # 不论'OPENAI_API_KEY'是否存在，都更新或设置 GPT key
+    config['OPENAI_API_KEY'] = gpt_key
 
-        # 将新的配置写入 config.json 文件
-        with open('config.json', 'w') as f:
-            json.dump(config, f)
+    # 将新的配置写入 config.json 文件
+    with open('config.json', 'w') as f:
+        json.dump(config, f,indent=4)
 
     return '', 204
 

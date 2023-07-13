@@ -40,6 +40,7 @@ def get_cloud_address():
     if os.path.exists(config_file):
         with open(config_file, 'rb') as f:
             raw_data = f.read()
+            # 确定编码 自配
             detected_encoding = chardet.detect(raw_data)['encoding']
         with open(config_file, 'r', encoding=detected_encoding) as f:
             config = json.load(f)
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     cloud_address, more_details, data = get_cloud_address()
 
     if cloud_address is None:
-        cloud_address = "http://127.0.0.1:7860"
+        cloud_address = "http://127.0.0.1:7861"
         print("使用本地Stable Diffusion")
     else:
         print("使用云端Stable Diffusion")

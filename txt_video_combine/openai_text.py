@@ -7,7 +7,7 @@ import openai
 import json
 
 # 接入openai接口
-with open('config.json') as config_file:
+with open('config.json','rb') as config_file:
     config = json.load(config_file)
     config_file.close()
 # print(config)
@@ -37,7 +37,7 @@ def ai_fenjing_array():
     lines = []
     # 将input中的文案.txt
     # 按照每一行切分到可修改的数组当中
-    with open("input/改文.txt", 'r', encoding='utf-8') as file:
+    with open("input/改文.txt", 'rb', encoding='utf-8') as file:
         for line in file:
             lines.append(line.strip())
     # print(lines)
