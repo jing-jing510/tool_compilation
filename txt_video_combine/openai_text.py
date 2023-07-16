@@ -66,14 +66,14 @@ def request_with_retry(messages, max_tokens=3000, max_requests=90, cooldown_seco
 def translate_text_en2cn(text):
     messages = [
         {"role": "system", "content": "你是一个有帮助的助手。"},
-        {"role": "user", "content": f"将以下中文文本翻译为英文：{text}"},
+        {"role": "user", "content": f"将以下英文文本翻译为中文：{text}"},
     ]
     return request_with_retry(messages)
 
 def translate_text_cn2en(text):
     messages = [
         {"role": "system", "content": "你是一个有帮助的助手。"},
-        {"role": "user", "content": f"将以下英文文本翻译成中文：{text}"},
+        {"role": "user", "content": f"将以下中文文本翻译成英文：{text}"},
     ]
     return request_with_retry(messages)
 def rewriteText(text):

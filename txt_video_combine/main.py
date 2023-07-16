@@ -3,16 +3,19 @@ import errno
 import io
 import os.path
 from openpyxl import Workbook
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory, url_for
 import json
 from openpyxl import load_workbook
 from werkzeug.utils import secure_filename
 import pandas as pd
 
-from openai_text import ai_fenjing, ai_prompt, translate_text_en2cn , rewriteText
+from openai_text import ai_fenjing, ai_prompt, translate_text_en2cn, rewriteText, translate_text_cn2en
 import os
+
+from txt_video_combine.step2_txt_to_image import run_program_with_args, run_program
+
 df = pd.DataFrame()
-app = Flask(__name__)
+app = Flask(__name__,static_folder='image')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -167,12 +170,19 @@ def upload_csv():
         print(e)
         return '', 500
 # 人物设定中 中文转英文
-@app.route('/translate_text', methods=['POST'])
+@app.route('/translate_text_en2cn', methods=['POST'])
 def translate_text_route():
     data = request.get_json()
-    text = data['text']  # 中文文本
+    text = data['text']  # 英文文本
     translated_text = translate_text_en2cn(text)  # 调用你的翻译函数
     return {'translatedText': translated_text}
+
+@app.route('/translate_text_cn2en', methods=['POST'])
+def translate_text_cn2en_router():
+    data = request.get_json()
+    text = data['text']  # 中文文本
+    translated_text_cn2en = translate_text_cn2en(text)  # 调用你的翻译函数
+    return {'translatedText': translated_text_cn2en}
 
 # 全面描述词 提交保存
 
@@ -180,11 +190,19 @@ def translate_text_route():
 @app.route('/save_to_config', methods=['POST'])
 def save_to_config():
     data = request.get_json()
-    with open('novel/config.json', 'w',encoding="utf-8") as json_file:
-        json.dump(data, json_file,ensure_ascii=False,indent=4)
+    globalHint = data['globalHint']
+    characterSetting = data['characterSetting']
+    # with open('config.json', 'w',encoding="utf-8") as json_file:
+    #     json.dump(data, json_file,ensure_ascii=False,indent=4)
+    # return '', 204
+    if os.path.exists('config.json'):
+        with open('config.json','rb',encoding="utf-8") as f:
+            config = json.load(f)
+    config['globalHint'] = globalHint
+    config['characterSetting'] = characterSetting
+    with open('config.json','w',encoding="utf-8") as json_file:
+        json.dump(config, json_file,ensure_ascii=False,indent=4)
     return '', 204
-
-#
 
 
 # 生成关键词
@@ -217,6 +235,12 @@ def save_csv():
 
     return '', 204  # return no content
 
+@app.route('/get_image_urls', methods=['GET'])
+def get_image_urls():
+    image_folder = 'image'
+    image_files = os.listdir(image_folder)
+    image_urls = [url_for('static', filename=image_file, _external=True) for image_file in image_files]
+    return jsonify(imageUrls=image_urls)
 # 从文件夹里读取关键词
 @app.route('/load_csv', methods=['POST'])
 def load_csv():
@@ -235,6 +259,7 @@ def load_csv():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    global data
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
@@ -242,31 +267,53 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    df = pd.read_csv(file)
+    text_file = io.TextIOWrapper(file, encoding='utf-8')
+    reader = csv.reader(text_file)
+    next(reader)  # 跳过标题行
+    data = list(reader)  # 保存数据到全局变量 data
 
-    # Assuming the CSV file has columns 'yuanwen', 'fenjing', 'key'
-    data = {
-        'yuanwen': df['原文'].tolist(),
-        'fenjing': df['AI分镜'].tolist(),
-        'key': df['关键词'].tolist()
+    # 我们假设 CSV 文件的列是按照 '原文', 'AI分镜', '关键词' 的顺序排列的
+    result = {
+        'yuanwen': [row[0] for row in data],
+        'fenjing': [row[1] for row in data],
+        'key': [row[2] for row in data]
     }
-    return jsonify(data)
+    return jsonify(result)
 
 # 编辑更新
 @app.route('/save', methods=['POST'])
 def save():
-    global df
-    data = request.get_json()
-    index = data.get('yuanwen_n')  # This should be the index of the row to update
-    fenjing = data.get('fenjing')
-    key = data.get('key')
+    global data
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data to save. Please upload a file first.'}), 400
+    request_data = request.get_json()
+    # 这是要更新的行的索引
+    index = int(request_data.get('yuanwen_n'))
+    fenjing = request_data.get('fenjing')
+    key = request_data.get('key')
 
-    # Update the DataFrame and the CSV file
-    df.loc[int(index), 'AI分镜'] = fenjing
-    df.loc[int(index), '关键词'] = key
-    df.to_csv('novel/关键词.csv', index=False)
+    # 更新数据
+    data[int(index)] = [data[int(index)][0], fenjing, key]
+    # data[index][1] = fenjing
+    # data[index][2] = key
+    # 将更新后的数据写回 CSV 文件
+    with open('novel/关键词.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['原文', 'AI分镜', '关键词'])  # Write the header row
+        writer.writerows(data)
 
     return jsonify({'status': 'success'})
 
+# @app.route('/images/<filename>')
+# def get_image(filename):
+#     return send_from_directory('image', filename)
+# 生成图片
+@app.route('/generate_images', methods=['POST'])
+def generate_images():
+    data = request.get_json()
+    config_path = data.get('configPath')
+    prompt_path = data.get('promptPath')
+    image_urls = run_program_with_args(config_path, prompt_path)
+    return jsonify(imageUrls=image_urls)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

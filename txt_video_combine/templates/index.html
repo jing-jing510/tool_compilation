@@ -108,18 +108,21 @@
 
         #sumContainer {
             display: flex;
+            width: 100%;
+            height: 800px;
             /*border: black;*/
         }
 
 
-        #yuanwen_n, #keyPrompt, #fenjing_n {
-            flex: 1;
+        #yuanwen_n, #keyPrompt, #fenjing_n, #keyPromptContainer, #sumButtonContainer, #keyPromptTranslate {
+            /*flex: 1;*/
             /*padding: 20px;*/
             border: 1px solid black;
-            margin: 10px;
+            /*margin: 10px;*/
         }
 
         #yuanwen_n {
+            overflow-y: auto;
             width: 20%;
         }
 
@@ -127,12 +130,35 @@
             /*border: 1px solid black;*/
         }
 
+        #keyPromptContainer {
+            width: 55%;
+        }
+
+        #fenjingAndDrawContainer {
+            width: 20%;
+        }
+
         #keyPrompt {
-            width: 60%;
+            width: 100%;
+            height: 400px;
         }
 
         #fenjing_n {
-            width: 20%;
+            overflow-y: auto;
+            width: 100%;
+            height: 400px;
+        }
+        #Draw >img {
+            width: 75%;
+        }
+
+        #sumButtonContainer {
+            width: 5%;
+        }
+
+        #sumSave_button {
+            width: 100%;
+            /*height: 100px;*/
         }
 
 
@@ -229,17 +255,207 @@
     <input type="file" id="globalPromptFileInput" accept=".json" style="display: none">
     <button id="globalPrompt_submit">提交</button>
 </div>
+<!--<h1>参数配置</h1>-->
+<!--<div id="sampler_selection_txt2img" class="gradio-group svelte-1oo81b7">-->
+<!--	<div class="form svelte-b6y5bg">-->
+<!--		<div id="txt2img_steps" class="block gradio-slider svelte-mppz8v padded"-->
+<!--		style="border-style: solid; overflow: visible;">-->
+<!--			<div class="wrap default svelte-j1gjts hide" style="position: absolute; padding: 0px;">-->
+<!--			</div>-->
+<!--			<div class="wrap svelte-1cl284s">-->
+<!--				<div class="head svelte-1cl284s">-->
+<!--					<label for="range_id_1">-->
+<!--						<span class="svelte-1gfkn6j" title="迭代改进生成的图像多少次；更高的值需要更长的时间；非常低的值会产生不好的结果">-->
+<!--							采样迭代步数(Steps)-->
+<!--						</span>-->
+<!--					</label>-->
+<!--					<input data-testid="number-input" type="number" min="1" max="150" step="1"-->
+<!--					class="svelte-1cl284s">-->
+<!--				</div>-->
+<!--			</div>-->
+<!--			<input type="range" id="range_id_1" name="cowbell" min="1" max="150" step="1"-->
+<!--			class="svelte-1cl284s">-->
+<!--		</div>-->
+<!--		<fieldset id="txt2img_sampling" class="block gradio-radio svelte-mppz8v padded"-->
+<!--		style="border-style: solid; overflow: visible;">-->
+<!--			<div class="wrap default svelte-j1gjts hide" style="position: absolute; padding: 0px;">-->
+<!--			</div>-->
+<!--			<span class="svelte-1gfkn6j" title="使用哪种算法生成图像">-->
+<!--				采样方法(Sampler)-->
+<!--			</span>-->
+<!--			<div class="wrap svelte-1p9xokt">-->
+<!--				<label style=" " class="svelte-1p9xokt selected">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="Euler a" class="svelte-1p9xokt"-->
+<!--					title="Euler Ancestral - very creative, each can get a completely different picture depending on step count, setting steps higher than 30-40 does not help">-->
+<!--					<span class="ml-2 svelte-1p9xokt" title="Euler Ancestral - very creative, each can get a completely different picture depending on step count, setting steps higher than 30-40 does not help">-->
+<!--						Euler a-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="Euler" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						Euler-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="LMS" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						LMS-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="Heun" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						Heun-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM2-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 a" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM2 a-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2S a" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2S a-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2M-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ SDE" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ SDE-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M SDE"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2M SDE-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM fast" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM fast-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM adaptive"-->
+<!--					class="svelte-1p9xokt" title="Ignores step count - uses a number of steps determined by the CFG and resolution">-->
+<!--					<span class="ml-2 svelte-1p9xokt" title="Ignores step count - uses a number of steps determined by the CFG and resolution">-->
+<!--						DPM adaptive-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="LMS Karras" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						LMS Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM2 Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 a Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM2 a Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2S a Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2S a Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2M Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ SDE Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ SDE Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M SDE Karras"-->
+<!--					class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						DPM++ 2M SDE Karras-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="DDIM" class="svelte-1p9xokt"-->
+<!--					title="Denoising Diffusion Implicit models - 最擅长局部重绘">-->
+<!--					<span class="ml-2 svelte-1p9xokt" title="Denoising Diffusion Implicit models - 最擅长局部重绘">-->
+<!--						DDIM-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="PLMS" class="svelte-1p9xokt">-->
+<!--					<span class="ml-2 svelte-1p9xokt">-->
+<!--						PLMS-->
+<!--					</span>-->
+<!--				</label>-->
+<!--				<label style=" " class="svelte-1p9xokt">-->
+<!--					<input type="radio" name="radio-txt2img_sampling" value="UniPC" class="svelte-1p9xokt"-->
+<!--					title="Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models">-->
+<!--					<span class="ml-2 svelte-1p9xokt" title="Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models">-->
+<!--						UniPC-->
+<!--					</span>-->
+<!--				</label>-->
+<!--			</div>-->
+<!--		</fieldset>-->
+<!--	</div>-->
+<!--</div>-->
 <h1>关键词整理</h1>
 <input type="file" id="csvFile" style="display: none;" onchange="upload()">
 <button onclick="document.getElementById('csvFile').click();">上传原文</button>
+<button id="generateImagesButton" onclick="generateImages()">一键生成图片</button>
 <div id="sumContainer">
-<!--    <input type="file" id="csvFile" accept=".csv" />-->
-<!--    <button onclick="upload()">Upload</button>-->
-    <div id="yuanwen_n"></div>
-    <div id="keyPrompt" contenteditable="true"></div>
-    <div id="fenjing_n" contenteditable="true" ></div>
+    <!--    <input type="file" id="csvFile" accept=".csv" />-->
+    <!--    <button onclick="upload()">Upload</button>-->
 
-    <button onclick="save()">Save Changes</button>
+    <div id="yuanwen_n" data-index="0">原文</div>
+    <div id="keyPromptContainer">
+        <div id="keyPrompt" data-index="1" contenteditable="true">关键词</div>
+        <!--        <span>翻译:</span>-->
+        <div id="keyPromptTranslate" contenteditable="true">等待翻译...</div>
+        <div id="characterSelect"></div>
+    </div>
+    <div id="fenjingAndDrawContainer">
+        <div id="fenjing_n" data-index="2" contenteditable="true">分镜</div>
+        <div id="Draw" contenteditable="true">图片</div>
+    </div>
+
+    <div id="sumButtonContainer">
+        <button id="translate_en2cn_button" onclick="translate_en2cn()">翻译提示词</button>
+        <button id="translate_cn2en_button" onclick="translate_cn2en()">翻译转提示词</button>
+        <button id="sumSave_button" onclick="save()">Save Changes</button>
+    </div>
 </div>
 
 
@@ -346,21 +562,21 @@
     });
 
     // 改文
-    $('#rewriteButton').click(function() {
-                let text = $('#textarea').val();
-                $.ajax({
-                    url: '/rewrite',
-                    type: 'POST',
-                    data: JSON.stringify({text: text}),
-                    contentType: 'application/json',
-                    success: function(data) {
-                        $('#textarea').val(data.rewritten_text);
-                    },
-                    error: function() {
-                        alert('An error occurred while rewriting the text.');
-                    }
-                });
-            });
+    $('#rewriteButton').click(function () {
+        let text = $('#textarea').val();
+        $.ajax({
+            url: '/rewrite',
+            type: 'POST',
+            data: JSON.stringify({text: text}),
+            contentType: 'application/json',
+            success: function (data) {
+                $('#textarea').val(data.rewritten_text);
+            },
+            error: function () {
+                alert('An error occurred while rewriting the text.');
+            }
+        });
+    });
 
     // 提交#textarea内容
     document.getElementById('saveTextButton').addEventListener('click', function () {
@@ -582,7 +798,7 @@
             // 获取这一行的“中文”单元格的内容
             var zhText = row.children[1].textContent;
             // 使用Fetch API向服务器发送POST请求
-            fetch('/translate_text', {
+            fetch('/translate_text_cn2en', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -658,7 +874,7 @@
             // 获取这一行的“中文”单元格的内容
             var zhText = row.children[1].textContent;
             // 使用Fetch API向服务器发送POST请求
-            fetch('/translate_text', {
+            fetch('/translate_text_cn2en', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -905,90 +1121,166 @@
         }
     });
 
-    // 关键词整理
-    document.getElementById('csvFile').addEventListener('change', function(evt) {
-    var file = evt.target.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var contents = e.target.result;
-        var lines = contents.split('\n');
+    // 加载imageUrls
 
-        // 清空内容
-        document.getElementById('yuanwen_n').innerHTML = '';
-        document.getElementById('KeyPrompt').innerHTML = '';
-        document.getElementById('fenjing_n').innerHTML = '';
-
-        for (var i = 0; i < lines.length; i++) {
-            var row = lines[i].split(',');
-            var button = document.createElement('button');
-            button.textContent = row[0]; // 原文
-            button.onclick = (function(row) {
-                return function() {
-                    document.getElementById('KeyPrompt').textContent = row[2]; // 关键词
-                    document.getElementById('fenjing_n').textContent = row[1]; // AI分镜
-                };
-            })(row);
-            document.getElementById('yuanwen_n').appendChild(button);
-        }
-    };
-    reader.readAsText(file);
-});
-
-     // 关键词上传
-let data = {}
+    // 关键词上传
+    let data = {}
+    let imageUrls=[];
+    window.onload = function() {
+    fetch('/get_image_urls')
+        .then(response => response.json())
+        .then(data => {
+            imageUrls = data.imageUrls;
+        });
+};
+    function getUuid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+          v = c == 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
     function upload() {
-            let file = $('#csvFile')[0].files[0];
-            let formData = new FormData();
-            formData.append('file', file);
+        let resId=getUuid();
+        let file = $('#csvFile')[0].files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+        formData.append('id', resId);
 
-            $.ajax({
-                url: '/upload',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    data = response;
-                    $('#yuanwen_n').empty();
-                    for (let i = 0; i < data.yuanwen.length; i++) {
-                        let btn = $('<button>' + data.yuanwen[i] + '</button>');
-                        btn.click(function() {
-                            $('#keyPrompt').text(data.key[i]);
-                            $('#fenjing_n').text(data.fenjing[i]);
-
-                        });
-                        $('#yuanwen_n').append(btn);
-                    }
-                },
-                error: function() {
-                    alert('An error occurred while uploading the file.');
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                data = response;
+                $('#yuanwen_n').empty();
+                for (let i = 0; i < data.yuanwen.length; i++) {
+                    let btn = $('<button>' + data.yuanwen[i] + '</button>');
+                    btn.click(function () {
+                        $('#keyPrompt').text(data.key[i]);
+                        $('#fenjing_n').text(data.fenjing[i]);
+                        const drawElement = document.getElementById('Draw');
+                        drawElement.innerHTML = '';
+                         let imageUrl = imageUrls[i];
+                        let img = document.createElement('img');
+                         img.src = imageUrl;
+                         drawElement.appendChild(img);
+                    });
+                    $('#yuanwen_n').append(btn);
                 }
-            });
-        }
+            },
+            error: function () {
+                alert('An error occurred while uploading the file.');
+            }
+        });
+    }
 
-//         编辑更新
+    //         编辑更新
     function save() {
-            let fenjing = $('#fenjing_n').text();
-            let key = $('#keyPrompt').text();
-            let yuanwen_n = $('#yuanwen_n button').index($('button:contains("' + fenjing + '")'));
+        let fenjing = $('#fenjing_n').text();
+        let key = $('#keyPrompt').text();
+        let yuanwen_n = $('#yuanwen_n').attr('data-index');
 
-            // Update the client-side data
-            data.fenjing[yuanwen_n] = fenjing;
-            data.key[yuanwen_n] = key;
+        // Update the client-side data
+        data.fenjing[yuanwen_n] = fenjing;
+        data.key[yuanwen_n] = key;
 
-            $.ajax({
-                url: '/save',
-                type: 'POST',
-                data: JSON.stringify({fenjing: fenjing, key: key, yuanwen_n: yuanwen_n}),
-                contentType: 'application/json',
-                success: function() {
-                    alert('Saved successfully!');
-                },
-                error: function() {
-                    alert('An error occurred while saving.');
-                }
+        $.ajax({
+            url: '/save',
+            type: 'POST',
+            data: JSON.stringify({fenjing: fenjing, key: key, yuanwen_n: yuanwen_n}),
+            contentType: 'application/json',
+            success: function () {
+                alert('Saved successfully!');
+            },
+            error: function () {
+                alert('An error occurred while saving.');
+            }
+        });
+    }
+
+    // 监听翻译
+    //     $(document).ready(function() {
+    //         $('#keyPrompt').on('input', function() {
+    //             var text = $(this).text();
+    //
+    //             $.ajax({
+    //                 url: '/translate_text_cn2en',
+    //                 type: 'POST',
+    //                 data: JSON.stringify({text: text}),
+    //                 contentType: 'application/json',
+    //                 success: function(response) {
+    //                     $('#keyPromptTranslate').text(response.translatedText);
+    //                 },
+    //                 error: function() {
+    //                     console.log('An error occurred while translating.');
+    //                 }
+    //             });
+    //         });
+    //     });
+    //     翻译提示词
+    function translate_en2cn() {
+        let text = $('#keyPrompt').text();
+        $.ajax({
+            url: '/translate_text_en2cn',
+            type: 'POST',
+            data: JSON.stringify({text: text}),
+            contentType: 'application/json',
+            success: function (response) {
+                $('#keyPromptTranslate').text(response.translatedText);
+            },
+            error: function () {
+                console.log('An error occurred while translating.');
+            }
+        });
+    }
+
+    //     中文提示词,翻译成英文
+    function translate_cn2en() {
+        let text = $('#keyPromptTranslate').text();
+        $.ajax({
+            url: '/translate_text_cn2en',
+            type: 'POST',
+            data: JSON.stringify({text: text}),
+            contentType: 'application/json',
+            success: function (response) {
+                $('#keyPrompt').text(response.translatedText);
+            },
+            error: function () {
+                console.log('An error occurred while translating.');
+            }
+        });
+    }
+
+    //     一键生成图片
+    function generateImages() {
+        const configPath = 'config.json';
+        const promptPath = 'novel/关键词.csv';
+
+        fetch('/generate_images', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                configPath: configPath,
+                promptPath: promptPath,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Assuming the server returns a list of image URLs
+                imageUrls = data.imageUrls;
+                // print(imageUrls)
+                // console(imageUrls)
+                // Display the images in #Draw
+            })
+            .catch((error) => {
+                console.error('Error:', error);
             });
-        }
+    }
 
 </script>
 </html>
