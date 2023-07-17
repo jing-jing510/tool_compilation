@@ -148,7 +148,8 @@
             width: 100%;
             height: 400px;
         }
-        #Draw >img {
+
+        #Draw > img {
             width: 75%;
         }
 
@@ -185,10 +186,6 @@
 <div id="bar">
     <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload()">
     <button onclick="document.getElementById('fileInput').click();">上传原文</button>
-    <!--    <button>智能分镜</button>-->
-    <!--    <button>分镜设置</button>-->
-    <!--    <button>分镜审核</button>-->
-    <!--    <button>脚本生成</button>-->
 </div>
 <div id="textareaContainer">
     <textarea id="textarea" placeholder="在这里输入内容..."></textarea>
@@ -255,196 +252,26 @@
     <input type="file" id="globalPromptFileInput" accept=".json" style="display: none">
     <button id="globalPrompt_submit">提交</button>
 </div>
-<!--<h1>参数配置</h1>-->
-<!--<div id="sampler_selection_txt2img" class="gradio-group svelte-1oo81b7">-->
-<!--	<div class="form svelte-b6y5bg">-->
-<!--		<div id="txt2img_steps" class="block gradio-slider svelte-mppz8v padded"-->
-<!--		style="border-style: solid; overflow: visible;">-->
-<!--			<div class="wrap default svelte-j1gjts hide" style="position: absolute; padding: 0px;">-->
-<!--			</div>-->
-<!--			<div class="wrap svelte-1cl284s">-->
-<!--				<div class="head svelte-1cl284s">-->
-<!--					<label for="range_id_1">-->
-<!--						<span class="svelte-1gfkn6j" title="迭代改进生成的图像多少次；更高的值需要更长的时间；非常低的值会产生不好的结果">-->
-<!--							采样迭代步数(Steps)-->
-<!--						</span>-->
-<!--					</label>-->
-<!--					<input data-testid="number-input" type="number" min="1" max="150" step="1"-->
-<!--					class="svelte-1cl284s">-->
-<!--				</div>-->
-<!--			</div>-->
-<!--			<input type="range" id="range_id_1" name="cowbell" min="1" max="150" step="1"-->
-<!--			class="svelte-1cl284s">-->
-<!--		</div>-->
-<!--		<fieldset id="txt2img_sampling" class="block gradio-radio svelte-mppz8v padded"-->
-<!--		style="border-style: solid; overflow: visible;">-->
-<!--			<div class="wrap default svelte-j1gjts hide" style="position: absolute; padding: 0px;">-->
-<!--			</div>-->
-<!--			<span class="svelte-1gfkn6j" title="使用哪种算法生成图像">-->
-<!--				采样方法(Sampler)-->
-<!--			</span>-->
-<!--			<div class="wrap svelte-1p9xokt">-->
-<!--				<label style=" " class="svelte-1p9xokt selected">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="Euler a" class="svelte-1p9xokt"-->
-<!--					title="Euler Ancestral - very creative, each can get a completely different picture depending on step count, setting steps higher than 30-40 does not help">-->
-<!--					<span class="ml-2 svelte-1p9xokt" title="Euler Ancestral - very creative, each can get a completely different picture depending on step count, setting steps higher than 30-40 does not help">-->
-<!--						Euler a-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="Euler" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						Euler-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="LMS" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						LMS-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="Heun" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						Heun-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM2-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 a" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM2 a-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2S a" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2S a-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2M-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ SDE" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ SDE-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M SDE"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2M SDE-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM fast" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM fast-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM adaptive"-->
-<!--					class="svelte-1p9xokt" title="Ignores step count - uses a number of steps determined by the CFG and resolution">-->
-<!--					<span class="ml-2 svelte-1p9xokt" title="Ignores step count - uses a number of steps determined by the CFG and resolution">-->
-<!--						DPM adaptive-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="LMS Karras" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						LMS Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM2 Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM2 a Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM2 a Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2S a Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2S a Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2M Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ SDE Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ SDE Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DPM++ 2M SDE Karras"-->
-<!--					class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						DPM++ 2M SDE Karras-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="DDIM" class="svelte-1p9xokt"-->
-<!--					title="Denoising Diffusion Implicit models - 最擅长局部重绘">-->
-<!--					<span class="ml-2 svelte-1p9xokt" title="Denoising Diffusion Implicit models - 最擅长局部重绘">-->
-<!--						DDIM-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="PLMS" class="svelte-1p9xokt">-->
-<!--					<span class="ml-2 svelte-1p9xokt">-->
-<!--						PLMS-->
-<!--					</span>-->
-<!--				</label>-->
-<!--				<label style=" " class="svelte-1p9xokt">-->
-<!--					<input type="radio" name="radio-txt2img_sampling" value="UniPC" class="svelte-1p9xokt"-->
-<!--					title="Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models">-->
-<!--					<span class="ml-2 svelte-1p9xokt" title="Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models">-->
-<!--						UniPC-->
-<!--					</span>-->
-<!--				</label>-->
-<!--			</div>-->
-<!--		</fieldset>-->
-<!--	</div>-->
-<!--</div>-->
+
 <h1>关键词整理</h1>
 <input type="file" id="csvFile" style="display: none;" onchange="upload()">
 <button onclick="document.getElementById('csvFile').click();">上传原文</button>
 <button id="generateImagesButton" onclick="generateImages()">一键生成图片</button>
 <div id="sumContainer">
-    <!--    <input type="file" id="csvFile" accept=".csv" />-->
-    <!--    <button onclick="upload()">Upload</button>-->
-
     <div id="yuanwen_n" data-index="0">原文</div>
     <div id="keyPromptContainer">
         <div id="keyPrompt" data-index="1" contenteditable="true">关键词</div>
         <!--        <span>翻译:</span>-->
         <div id="keyPromptTranslate" contenteditable="true">等待翻译...</div>
-        <div id="characterSelect"></div>
+        <div id="characterSelectContainer">
+            <!-- <button id="loadCharacterButton" onclick="loadCharacterSettings()">加载角色</button>
+            <select id="characterSelect" onchange="selectCharacter()"></select>
+            <input type="text" id="enText" > -->
+            <button id="loadCharacterButton" onclick="loadCharacterSettings()">加载角色</button>
+            <select id="characterSelect" onchange="selectCharacter()"></select>
+            <input type="text" id="enText">
+            <button id="loadCharacter2KeyPrompt" onclick="appendEnTextToKeyPrompt()">附加</button>
+        </div>
     </div>
     <div id="fenjingAndDrawContainer">
         <div id="fenjing_n" data-index="2" contenteditable="true">分镜</div>
@@ -1125,23 +952,26 @@
 
     // 关键词上传
     let data = {}
-    let imageUrls=[];
-    window.onload = function() {
-    fetch('/get_image_urls')
-        .then(response => response.json())
-        .then(data => {
-            imageUrls = data.imageUrls;
-        });
-};
+    let imageUrls = [];
+    let lastClickedButton = null;
+    window.onload = function () {
+        fetch('/get_image_urls')
+            .then(response => response.json())
+            .then(data => {
+                imageUrls = data.imageUrls;
+            });
+    };
+
     function getUuid() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (Math.random() * 16) | 0,
-          v = c == 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (Math.random() * 16) | 0,
+                v = c == 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
     }
+
     function upload() {
-        let resId=getUuid();
+        let resId = getUuid();
         let file = $('#csvFile')[0].files[0];
         let formData = new FormData();
         formData.append('file', file);
@@ -1159,14 +989,21 @@
                 for (let i = 0; i < data.yuanwen.length; i++) {
                     let btn = $('<button>' + data.yuanwen[i] + '</button>');
                     btn.click(function () {
+                        lastClickedButton = btn;  // Save this button as the last clicked button
+
                         $('#keyPrompt').text(data.key[i]);
                         $('#fenjing_n').text(data.fenjing[i]);
                         const drawElement = document.getElementById('Draw');
+
                         drawElement.innerHTML = '';
-                         let imageUrl = imageUrls[i];
+                        let imageUrl = imageUrls[i];
                         let img = document.createElement('img');
-                         img.src = imageUrl;
-                         drawElement.appendChild(img);
+                        img.id = 'myImage';
+                        // img.src = imageUrl;
+                        img.src = imageUrl + '?t=' + new Date().getTime();
+                        drawElement.appendChild(img);
+                        // 获取用户的编辑
+                        $('#keyPrompt').attr('data-index', i);
                     });
                     $('#yuanwen_n').append(btn);
                 }
@@ -1271,16 +1108,131 @@
         })
             .then(response => response.json())
             .then(data => {
-                // Assuming the server returns a list of image URLs
-                imageUrls = data.imageUrls;
-                // print(imageUrls)
-                // console(imageUrls)
-                // Display the images in #Draw
+                // After generating the images, get the new image URLs
+                fetch('/get_all_image_urls')
+                    .then(response => response.json())
+                    .then(data => {
+                        imageUrls = data.imageUrls;  // Save the new image URLs to the global variable
+
+                        // If a button has been clicked before, trigger its click event
+                        if (lastClickedButton) {
+                            lastClickedButton.click();
+                        }
+                    });
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
     }
+
+    // function updateImage() {
+    //     fetch('/get_latest_image_url')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Add a timestamp as a query parameter to force the browser to reload the image
+    //             var imageElement = document.getElementById('myImage');
+    //             imageElement.src = data.imageUrl + '?t=' + new Date().getTime();
+    //         });
+    // }
+
+
+    // 获取关键词元素
+    const keyPromptElement = document.getElementById('keyPrompt');
+
+    // 保存用户的编辑
+    keyPromptElement.addEventListener('blur', function () {
+        // 获取元素的新内容
+        const newContent = keyPromptElement.textContent;
+
+        // 发送 POST 请求到服务器，将新的内容保存到服务器
+        fetch('/save_edited_content', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                elementId: 'keyPrompt',
+                newContent: newContent,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 处理服务器返回的响应
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+    // 获取用户的编辑
+    function getEditedContent() {
+        let index = $('#yuanwen_n').attr('data-index');
+
+        fetch(`/get_edited_content?elementId=keyPrompt&index=${index}`)
+            .then(response => response.json())
+            .then(data => {
+                // 更新元素的内容
+                keyPromptElement.textContent = data.newContent;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    // 点击 yuanwen_n 时获取编辑的内容
+    $('#yuanwen_n').click(function () {
+        getEditedContent();
+    });
+
+        let characterSettings = [];
+    // 获取config.json里面的角色配置
+    function loadCharacterSettings() {
+        fetch('/get_character_settings')
+            .then(response => response.json())
+            .then(data => {
+                characterSettings = Object.values(data);
+                renderCharacterOptions(characterSettings);
+                selectCharacter()
+                // console.log(characterSettings)
+            });
+    }
+
+    function renderCharacterOptions(characterSettings) {
+        const characterSelect = document.getElementById('characterSelect');
+        characterSelect.innerHTML = '';
+
+        if (characterSettings.length === 0) {
+            const option = document.createElement('option');
+            option.text = '角色设置为空';
+            characterSelect.add(option);
+        } else {
+            characterSettings.forEach(character => {
+                const option = document.createElement('option');
+                option.value = character.character;
+                option.text = character.character;
+                characterSelect.add(option);
+            });
+        }
+    }
+
+    function selectCharacter() {
+        const characterSelect = document.getElementById('characterSelect');
+        // console.log(characterSelect.value)
+        const selectedCharacter = characterSelect.options[characterSelect.selectedIndex].value;
+        // console.log(characterSelect.selectedIndex)
+        const selectedCharacterSetting = characterSettings.find(character => character.character === selectedCharacter);
+        // console.log(selectedCharacterSetting)
+        if (selectedCharacterSetting) {
+            document.getElementById("enText").value = selectedCharacterSetting.en_text;
+            console.log(document.getElementById("enText").value)
+        }
+    }
+    function appendEnTextToKeyPrompt() {
+        const enText = document.getElementById("enText").value;
+        document.getElementById("keyPrompt").textContent += ` ${enText}`;
+    }
+
 
 </script>
 </html>

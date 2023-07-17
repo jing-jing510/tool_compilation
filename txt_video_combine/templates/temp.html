@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <title>Hello,world!</title>
+    <style>
+        #sumContainer {
+            display: flex;
+            width: 100%;
+            height: 800px;
+            /*border: black;*/
+        }
+
+
+        #yuanwen_n, #keyPrompt, #fenjing_n, #keyPromptContainer, #sumButtonContainer, #keyPromptTranslate {
+            /*flex: 1;*/
+            /*padding: 20px;*/
+            border: 1px solid black;
+            /*margin: 10px;*/
+        }
+
+        #yuanwen_n {
+            overflow-y: auto;
+            width: 20%;
+        }
+
+        #yuanwen_n > div {
+            /*border: 1px solid black;*/
+        }
+
+        #keyPromptContainer {
+            width: 55%;
+        }
+
+        #fenjingAndDrawContainer {
+            width: 20%;
+        }
+
+        #keyPrompt {
+            width: 100%;
+            height: 400px;
+        }
+
+        #fenjing_n {
+            overflow-y: auto;
+            width: 100%;
+            height: 400px;
+        }
+
+        #Draw > img {
+            width: 75%;
+        }
+
+        #sumButtonContainer {
+            width: 5%;
+        }
+
+        #sumSave_button {
+            width: 100%;
+            /*height: 100px;*/
+        }
+
+        #characterSelect {
+            width: 100px;
+        }
+        #characterSelectContainer > input{
+            width: 450px;
+        }
+    </style>
+<body>
+<h1>关键词整理</h1>
+<input type="file" id="csvFile" style="display: none;" onchange="upload()">
+<button onclick="document.getElementById('csvFile').click();">上传原文</button>
+<button id="generateImagesButton" onclick="generateImages()">一键生成图片</button>
+<div id="sumContainer">
+    <div id="yuanwen_n" data-index="0">原文</div>
+    <div id="keyPromptContainer">
+        <div id="keyPrompt" data-index="1" contenteditable="true">关键词</div>
+        <!--        <span>翻译:</span>-->
+        <div id="keyPromptTranslate" contenteditable="true">等待翻译...</div>
+        <div id="characterSelectContainer">
+            <!-- <button id="loadCharacterButton" onclick="loadCharacterSettings()">加载角色</button>
+            <select id="characterSelect" onchange="selectCharacter()"></select>
+            <input type="text" id="enText" > -->
+            <button id="loadCharacterButton" onclick="loadCharacterSettings()">加载角色</button>
+            <select id="characterSelect" onchange="selectCharacter()"></select>
+            <input type="text" id="enText">
+            <button id="loadCharacter2KeyPrompt" onclick="appendEnTextToKeyPrompt()">附加</button>
+        </div>
+    </div>
+    <div id="fenjingAndDrawContainer">
+        <div id="fenjing_n" data-index="2" contenteditable="true">分镜</div>
+        <div id="Draw" contenteditable="true">图片</div>
+    </div>
+
+    <div id="sumButtonContainer">
+        <button id="translate_en2cn_button" onclick="translate_en2cn()">翻译提示词</button>
+        <button id="translate_cn2en_button" onclick="translate_cn2en()">翻译转提示词</button>
+        <button id="sumSave_button" onclick="save()">Save Changes</button>
+    </div>
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    // 关键词上传
+    let data = {}
+    let imageUrls = [];
+    let lastClickedButton = null;
+    window.onload = function () {
+        fetch('/get_image_urls')
+            .then(response => response.json())
+            .then(data => {
+                imageUrls = data.imageUrls;
+            });
+    };
+
+    function getUuid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (Math.random() * 16) | 0,
+                v = c == 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    function upload() {
+        let resId = getUuid();
+        let file = $('#csvFile')[0].files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+        formData.append('id', resId);
+
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                data = response;
+                $('#yuanwen_n').empty();
+                for (let i = 0; i < data.yuanwen.length; i++) {
+                    let btn = $('<button>' + data.yuanwen[i] + '</button>');
+                    btn.click(function () {
+                        lastClickedButton = btn;  // Save this button as the last clicked button
+
+                        $('#keyPrompt').text(data.key[i]);
+                        $('#fenjing_n').text(data.fenjing[i]);
+                        const drawElement = document.getElementById('Draw');
+
+                        drawElement.innerHTML = '';
+                        let imageUrl = imageUrls[i];
+                        let img = document.createElement('img');
+                        img.id = 'myImage';
+                        // img.src = imageUrl;
+                        img.src = imageUrl + '?t=' + new Date().getTime();
+                        drawElement.appendChild(img);
+                        // 获取用户的编辑
+                        $('#keyPrompt').attr('data-index', i);
+                    });
+                    $('#yuanwen_n').append(btn);
+                }
+            },
+            error: function () {
+                alert('An error occurred while uploading the file.');
+            }
+        });
+    }
+
+    //         编辑更新
+    function save() {
+        let fenjing = $('#fenjing_n').text();
+        let key = $('#keyPrompt').text();
+        let yuanwen_n = $('#yuanwen_n').attr('data-index');
+
+        // Update the client-side data
+        data.fenjing[yuanwen_n] = fenjing;
+        data.key[yuanwen_n] = key;
+
+        $.ajax({
+            url: '/save',
+            type: 'POST',
+            data: JSON.stringify({fenjing: fenjing, key: key, yuanwen_n: yuanwen_n}),
+            contentType: 'application/json',
+            success: function () {
+                alert('Saved successfully!');
+            },
+            error: function () {
+                alert('An error occurred while saving.');
+            }
+        });
+    }
+
+    // 监听翻译
+    //     $(document).ready(function() {
+    //         $('#keyPrompt').on('input', function() {
+    //             var text = $(this).text();
+    //
+    //             $.ajax({
+    //                 url: '/translate_text_cn2en',
+    //                 type: 'POST',
+    //                 data: JSON.stringify({text: text}),
+    //                 contentType: 'application/json',
+    //                 success: function(response) {
+    //                     $('#keyPromptTranslate').text(response.translatedText);
+    //                 },
+    //                 error: function() {
+    //                     console.log('An error occurred while translating.');
+    //                 }
+    //             });
+    //         });
+    //     });
+    //     翻译提示词
+    function translate_en2cn() {
+        let text = $('#keyPrompt').text();
+        $.ajax({
+            url: '/translate_text_en2cn',
+            type: 'POST',
+            data: JSON.stringify({text: text}),
+            contentType: 'application/json',
+            success: function (response) {
+                $('#keyPromptTranslate').text(response.translatedText);
+            },
+            error: function () {
+                console.log('An error occurred while translating.');
+            }
+        });
+    }
+
+    //     中文提示词,翻译成英文
+    function translate_cn2en() {
+        let text = $('#keyPromptTranslate').text();
+        $.ajax({
+            url: '/translate_text_cn2en',
+            type: 'POST',
+            data: JSON.stringify({text: text}),
+            contentType: 'application/json',
+            success: function (response) {
+                $('#keyPrompt').text(response.translatedText);
+            },
+            error: function () {
+                console.log('An error occurred while translating.');
+            }
+        });
+    }
+
+    //     一键生成图片
+    function generateImages() {
+        const configPath = 'config.json';
+        const promptPath = 'novel/关键词.csv';
+
+        fetch('/generate_images', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                configPath: configPath,
+                promptPath: promptPath,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // After generating the images, get the new image URLs
+                fetch('/get_all_image_urls')
+                    .then(response => response.json())
+                    .then(data => {
+                        imageUrls = data.imageUrls;  // Save the new image URLs to the global variable
+
+                        // If a button has been clicked before, trigger its click event
+                        if (lastClickedButton) {
+                            lastClickedButton.click();
+                        }
+                    });
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    let characterSettings = [];
+    // 获取config.json里面的角色配置
+    function loadCharacterSettings() {
+        fetch('/get_character_settings')
+            .then(response => response.json())
+            .then(data => {
+                characterSettings = Object.values(data);
+                renderCharacterOptions(characterSettings);
+                selectCharacter()
+                // console.log(characterSettings)
+            });
+    }
+    
+    function renderCharacterOptions(characterSettings) {
+        const characterSelect = document.getElementById('characterSelect');
+        characterSelect.innerHTML = '';
+
+        if (characterSettings.length === 0) {
+            const option = document.createElement('option');
+            option.text = '角色设置为空';
+            characterSelect.add(option);
+        } else {
+            characterSettings.forEach(character => {
+                const option = document.createElement('option');
+                option.value = character.character;
+                option.text = character.character;
+                characterSelect.add(option);
+            });
+        }
+    }
+
+    function selectCharacter() {
+        const characterSelect = document.getElementById('characterSelect');
+        // console.log(characterSelect.value)
+        const selectedCharacter = characterSelect.options[characterSelect.selectedIndex].value;
+        // console.log(characterSelect.selectedIndex)
+        const selectedCharacterSetting = characterSettings.find(character => character.character === selectedCharacter);
+        // console.log(selectedCharacterSetting)
+        if (selectedCharacterSetting) {
+            document.getElementById("enText").value = selectedCharacterSetting.en_text;
+            console.log(document.getElementById("enText").value)
+        }
+    }
+    function appendEnTextToKeyPrompt() {
+        const enText = document.getElementById("enText").value;
+        document.getElementById("keyPrompt").textContent += ` ${enText}`;
+    }
+    
+
+</script>

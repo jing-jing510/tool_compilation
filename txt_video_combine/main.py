@@ -2,6 +2,9 @@ import csv
 import errno
 import io
 import os.path
+
+from flask_cors import CORS
+import chardet
 from openpyxl import Workbook
 from flask import Flask, request, jsonify, render_template, send_from_directory, url_for
 import json
@@ -15,13 +18,18 @@ import os
 from txt_video_combine.step2_txt_to_image import run_program_with_args, run_program
 
 df = pd.DataFrame()
-app = Flask(__name__,static_folder='image')
+app = Flask(__name__, static_folder='image', template_folder='templates')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('temp.html')
+
+
+CORS(app)
+
+
 # 上传原文件
 @app.route('/handle_file', methods=['POST'])
 def handle_file():
@@ -52,7 +60,7 @@ def set_key():
 
     # 将新的配置写入 config.json 文件
     with open('config.json', 'w') as f:
-        json.dump(config, f,indent=4)
+        json.dump(config, f, indent=4)
 
     return '', 204
 
@@ -61,6 +69,7 @@ def set_key():
 @app.route('/create_folder', methods=['POST'])
 def create_folder():
     data = request.get_json()
+    print(data)
     folder_name = data['folderName']
     directory = 'novel/' + folder_name
     print(directory)
@@ -71,8 +80,6 @@ def create_folder():
         return jsonify({"status": "failed", "message": "Folder already exists"})
 
 
-
-
 @app.route('/rewrite', methods=['POST'])
 def rewrite():
     text = request.get_json().get('text')
@@ -80,7 +87,7 @@ def rewrite():
     rewritten_text = rewriteText(text)
     print(rewritten_text)
     # Save the rewritten text to a file
-    with open('novel/改文.txt', 'w') as f:
+    with open('novel/原文.txt', 'w', encoding='utf-8') as f:
         f.write(rewritten_text)
 
     return jsonify({'rewritten_text': rewritten_text})
@@ -92,7 +99,7 @@ def save_text():
     data = request.get_json()
     folder_name = data['folderName']
     text = data['text']
-    directory = 'novel/' + folder_name
+    directory = 'novel/'
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -155,7 +162,7 @@ def upload_csv():
             file.save(file_path)
 
             # 增加了encoding='utf-8-sig'，可以处理带有BOM的UTF-8文件
-            data = pd.read_csv(file_path, encoding='utf-8-sig')
+            data = pd.read_csv(file_path, encoding='utf-8')
 
             # 将数据转换为列表
             rows = data.values.tolist()
@@ -169,6 +176,8 @@ def upload_csv():
     except Exception as e:
         print(e)
         return '', 500
+
+
 # 人物设定中 中文转英文
 @app.route('/translate_text_en2cn', methods=['POST'])
 def translate_text_route():
@@ -177,12 +186,14 @@ def translate_text_route():
     translated_text = translate_text_en2cn(text)  # 调用你的翻译函数
     return {'translatedText': translated_text}
 
+
 @app.route('/translate_text_cn2en', methods=['POST'])
 def translate_text_cn2en_router():
     data = request.get_json()
     text = data['text']  # 中文文本
     translated_text_cn2en = translate_text_cn2en(text)  # 调用你的翻译函数
     return {'translatedText': translated_text_cn2en}
+
 
 # 全面描述词 提交保存
 
@@ -196,12 +207,12 @@ def save_to_config():
     #     json.dump(data, json_file,ensure_ascii=False,indent=4)
     # return '', 204
     if os.path.exists('config.json'):
-        with open('config.json','rb',encoding="utf-8") as f:
+        with open('config.json', 'r', encoding="utf-8") as f:
             config = json.load(f)
     config['globalHint'] = globalHint
     config['characterSetting'] = characterSetting
-    with open('config.json','w',encoding="utf-8") as json_file:
-        json.dump(config, json_file,ensure_ascii=False,indent=4)
+    with open('config.json', 'w', encoding="utf-8") as json_file:
+        json.dump(config, json_file, ensure_ascii=False, indent=4)
     return '', 204
 
 
@@ -220,6 +231,7 @@ def handle_ai_prompt():
         print(e)
         return jsonify({'error': str(e)}), 500
 
+
 # 生成翻译
 
 # 保存关键词
@@ -235,12 +247,15 @@ def save_csv():
 
     return '', 204  # return no content
 
+
 @app.route('/get_image_urls', methods=['GET'])
 def get_image_urls():
     image_folder = 'image'
     image_files = os.listdir(image_folder)
     image_urls = [url_for('static', filename=image_file, _external=True) for image_file in image_files]
     return jsonify(imageUrls=image_urls)
+
+
 # 从文件夹里读取关键词
 @app.route('/load_csv', methods=['POST'])
 def load_csv():
@@ -266,19 +281,26 @@ def upload_file():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+    filename = secure_filename(file.filename)
+    file.save(os.path.join('novel', filename))
 
-    text_file = io.TextIOWrapper(file, encoding='utf-8')
-    reader = csv.reader(text_file)
-    next(reader)  # 跳过标题行
-    data = list(reader)  # 保存数据到全局变量 data
+    # Detect file encoding
+    rawdata = open(os.path.join('novel', filename), 'rb').read()
+    result = chardet.detect(rawdata)
+    charenc = result['encoding']
+    with open(os.path.join('novel', filename), 'r', encoding=charenc) as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        data = list(reader)  # Save the data to the global variable data
 
-    # 我们假设 CSV 文件的列是按照 '原文', 'AI分镜', '关键词' 的顺序排列的
+    # We assume the columns in the CSV file are in the order '原文', 'AI分镜', '关键词'
     result = {
         'yuanwen': [row[0] for row in data],
         'fenjing': [row[1] for row in data],
         'key': [row[2] for row in data]
     }
     return jsonify(result)
+
 
 # 编辑更新
 @app.route('/save', methods=['POST'])
@@ -304,6 +326,7 @@ def save():
 
     return jsonify({'status': 'success'})
 
+
 # @app.route('/images/<filename>')
 # def get_image(filename):
 #     return send_from_directory('image', filename)
@@ -315,5 +338,29 @@ def generate_images():
     prompt_path = data.get('promptPath')
     image_urls = run_program_with_args(config_path, prompt_path)
     return jsonify(imageUrls=image_urls)
+
+
+@app.route('/get_all_image_urls', methods=['GET'])
+def get_all_image_urls():
+    image_dir = app.static_folder  # Use the 'image' directory
+    image_files = os.listdir(image_dir)
+    image_urls = [url_for('static', filename=image_file, _external=True) for image_file in image_files]
+    return jsonify(imageUrls=image_urls)
+
+
+# 后端代码
+# import json
+# from flask import jsonify
+
+@app.route('/get_character_settings', methods=['GET'])
+def get_character_settings():
+    with open('config.json', 'r',encoding='utf-8') as config_file:
+        config_data = json.load(config_file)
+        character_settings = config_data['characterSetting']
+        print(character_settings)
+    character_settings_dict = {character['character']: character for character in character_settings}
+    return jsonify(character_settings_dict)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
